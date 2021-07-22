@@ -3,7 +3,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'better_try_catch.dart';
 
 class Boot {
-  static _OperationsHandler? operator;
+  static _OperationsHandler? _operator;
+
+  static final Boot _instance = Boot._internal();
+
+  factory Boot() {
+    return _instance;
+  }
+
+  Boot._internal();
 
   init() async {
     await _initInternal();
@@ -11,7 +19,7 @@ class Boot {
 
   _initInternal() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    operator = _BootOperator(prefs);
+    _operator = _BootOperator(prefs);
   }
 
   _BootBuilder executeOnce(String mark, block()) {
@@ -20,16 +28,16 @@ class Boot {
 
   List<_Operation> getAllOperations() {
     assertInitialized();
-    return operator!.getAllOperations();
+    return _operator!.getAllOperations();
   }
 
   bool isExecuted(String mark) {
     assertInitialized();
-    return operator!.isExecuted(mark);
+    return _operator!.isExecuted(mark);
   }
 
   assertInitialized() {
-    assert(operator != null, "Boot has not been initialized");
+    assert(_operator != null, "Boot has not been initialized");
   }
 }
 
@@ -41,7 +49,7 @@ class _Operation {
 
   static _Operation fromMark(String mark) {
     String internalMark = "flutter.boot.$mark";
-    bool executed = Boot.operator?.isExecuted(internalMark) ?? false;
+    bool executed = Boot._operator?.isExecuted(internalMark) ?? false;
     return _Operation._(internalMark, executed);
   }
 
@@ -69,12 +77,12 @@ class _BootBuilder {
   }
 
   _BootBuilder setExecuted() {
-    Boot.operator?.setExecuted(operation);
+    Boot._operator?.setExecuted(operation);
     return this;
   }
 
   _BootBuilder execute(block()) {
-    Boot.operator?.executeOnce(operation, block);
+    Boot._operator?.executeOnce(operation, block);
     return this;
   }
 

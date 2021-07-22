@@ -31,9 +31,7 @@ class BootOperator implements OperationsHandler {
   @override
   List<Operation> getAllOperations() {
     return prefs.getKeys().map((String key) {
-      bool value = prefs.getBool(key) ?? false;
-      bool executed = value;
-      return Operation(key, executed);
+      return Operation.fromMark(key);
     }).toList();
   }
 }

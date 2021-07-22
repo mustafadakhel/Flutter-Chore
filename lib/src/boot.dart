@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'better_try_catch.dart';
 
 class Boot {
-  _OperationsHandler? _operator;
+  static _OperationsHandler? _operator;
 
   static final Boot _instance = Boot._internal();
 
@@ -39,11 +39,11 @@ class Boot {
   }
 
   static _assertInitialized() {
-    assert(_instance._operator != null, "Boot has not been initialized");
+    assert(_operator != null, "Boot has not been initialized");
   }
 
   _BootBuilder _executeOnce(String mark, Function() block) {
-    return _BootBuilder.withMark(mark).execute(block);
+    return _BootBuilder.withMark(mark)._execute(block);
   }
 
   List<_Operation> _getAllOperations() {
@@ -51,7 +51,7 @@ class Boot {
   }
 
   bool _isExecuted(String mark) {
-    return _instance._operator!.isExecuted(mark);
+    return _operator!.isExecuted(mark);
   }
 }
 
@@ -74,10 +74,10 @@ class _Operation {
 }
 
 class _BootBuilder {
-  _Operation operation;
+  _Operation _operation;
 
-  _BootBuilder._(this.operation) {
-    _alreadyExecuted = operation.executed;
+  _BootBuilder._(this._operation) {
+    _alreadyExecuted = _operation.executed;
   }
 
   bool _alreadyExecuted = false;
@@ -86,17 +86,17 @@ class _BootBuilder {
     return _BootBuilder._(_Operation.fromMark(mark));
   }
 
-  bool isExecuted() {
+  bool _isExecuted() {
     return _alreadyExecuted;
   }
 
-  _BootBuilder setExecuted() {
-    Boot._operator?.setExecuted(operation);
+  _BootBuilder _setExecuted() {
+    Boot._operator?.setExecuted(_operation);
     return this;
   }
 
-  _BootBuilder execute(block()) {
-    Boot._operator?.executeOnce(operation, block);
+  _BootBuilder _execute(block()) {
+    Boot._operator?.executeOnce(_operation, block);
     return this;
   }
 

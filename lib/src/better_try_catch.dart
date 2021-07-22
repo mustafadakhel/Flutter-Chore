@@ -11,7 +11,7 @@ class Result<T> {
 
   Result(this.value);
 
-  bool get isSuccess => value! is Failure;
+  bool get isSuccess => !(value is Failure);
 
   bool get isFailure => value is Failure;
 

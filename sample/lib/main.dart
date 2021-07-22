@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boot/flutter_boot.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Boot.init();
   runApp(MyApp());
 }
 
@@ -27,6 +30,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String text = "This is not your first time";
+
+  @override
+  void initState() {
+    Boot.executeOnce("sample", () {
+      setState(() {
+        text = "This is your first time";
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +48,9 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(),
+      body: Center(
+        child: Text(text),
+      ),
     );
   }
 }

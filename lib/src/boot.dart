@@ -43,7 +43,7 @@ class Boot {
   }
 
   _BootBuilder _executeOnce(String mark, Function() block) {
-    return _BootBuilder.withMark(mark)._execute(block);
+    return _BootBuilder.withMark(mark)._executeOnce(block);
   }
 
   List<_Operation> _getAllOperations() {
@@ -95,7 +95,7 @@ class _BootBuilder {
     return this;
   }
 
-  _BootBuilder _execute(block()) {
+  _BootBuilder _executeOnce(block()) {
     Boot._operator?.executeOnce(_operation, block);
     return this;
   }

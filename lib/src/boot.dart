@@ -3,9 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'better_try_catch.dart';
 
 class Boot {
-  static _OperationsHandler? _operator;
+  _OperationsHandler? _operator;
 
   static final Boot _instance = Boot._internal();
+
+  Boot._();
 
   factory Boot() {
     return _instance;
@@ -13,31 +15,43 @@ class Boot {
 
   Boot._internal();
 
-  init() async {
-    await _initInternal();
+  static init() async {
+    await _instance._init();
   }
 
-  _initInternal() async {
+  _init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _operator = _BootOperator(prefs);
   }
 
-  _BootBuilder executeOnce(String mark, block()) {
+  static _BootBuilder executeOnce(String mark, block()) {
+    return _instance._executeOnce(mark, block);
+  }
+
+  static List<_Operation> getAllOperations() {
+    _assertInitialized();
+    return _instance._getAllOperations();
+  }
+
+  static bool isExecuted(String mark) {
+    _assertInitialized();
+    return _instance._isExecuted(mark);
+  }
+
+  static _assertInitialized() {
+    assert(_instance._operator != null, "Boot has not been initialized");
+  }
+
+  _BootBuilder _executeOnce(String mark, Function() block) {
     return _BootBuilder.withMark(mark).execute(block);
   }
 
-  List<_Operation> getAllOperations() {
-    assertInitialized();
+  List<_Operation> _getAllOperations() {
     return _operator!.getAllOperations();
   }
 
-  bool isExecuted(String mark) {
-    assertInitialized();
-    return _operator!.isExecuted(mark);
-  }
-
-  assertInitialized() {
-    assert(_operator != null, "Boot has not been initialized");
+  bool _isExecuted(String mark) {
+    return _instance._operator!.isExecuted(mark);
   }
 }
 

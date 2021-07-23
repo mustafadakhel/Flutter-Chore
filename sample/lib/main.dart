@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         text = "This is your fourth time";
       });
-    }).afterLastTime(() {
+    }).ifDone(() {
       setState(() {
         text = "Everything is done";
       });

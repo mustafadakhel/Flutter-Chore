@@ -126,7 +126,7 @@ class _ChoreJanitor {
 
   _ChoreJanitor(this._choreItem);
 
-  _ChoreJanitor afterLastTime(func()) {
+  _ChoreJanitor ifDone(func()) {
     if (_choreItem.done) func();
     return this;
   }

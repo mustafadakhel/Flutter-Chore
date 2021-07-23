@@ -37,15 +37,11 @@ class Chore {
   }
 
   static _ChoreBuilder invokeThrice(f()) {
-    return invokeThrice(f);
+    return _instance._invokeThrice(f);
   }
 
   _ChoreBuilder _invoke(f()) {
     return _ChoreBuilder(butler!)._func(f);
-  }
-
-  _ChoreBuilder _invokeOnly(f(), int times) {
-    return _invoke(f).times(times);
   }
 
   _ChoreBuilder _invokeOnce(f()) {
@@ -104,7 +100,8 @@ class _ChoreBuilder {
     String internalMark = "flutter.chore.$mark";
     _choreItem
       ..mark = internalMark
-      ..timesRemaining = butler.timesRemaining(internalMark) ?? _choreItem._times
+      ..timesRemaining =
+          butler.timesRemaining(internalMark) ?? _choreItem._times
       ..done = _choreItem.timesRemaining == 0;
     return _ChoreRunner(_choreItem, butler);
   }
@@ -158,11 +155,6 @@ class _ChoreButler {
     return timesRemaining(choreItem.mark)! == 0;
   }
 
-  setDone(ChoreItem choreItem) {
-    prefs.setInt(choreItem.mark, 0);
-    choreItem.done = true;
-  }
-
   run(ChoreItem choreItem) {
     if (!isDone(choreItem))
       runCatching(choreItem._func).onSuccess((value) {
@@ -188,13 +180,5 @@ class _ChoreButler {
 
   registerChore(ChoreItem choreItem) {
     prefs.setInt(choreItem.mark, choreItem._times);
-  }
-
-  ChoreItem getChoreItemWithMark(String mark) {
-    int times = timesRemaining(mark) ?? 1;
-    ChoreItem item =
-        ChoreItem._withTimesRemaining(timesRemaining: times, mark: mark);
-    item..done = isDone(item);
-    return item;
   }
 }

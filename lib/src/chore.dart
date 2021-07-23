@@ -69,9 +69,9 @@ class Chore {
 
 class _ChoreBuilder {
   late ChoreItem _choreItem = ChoreItem._empty();
-  _ChoreButler butler;
+  _ChoreButler _butler;
 
-  _ChoreBuilder(this.butler);
+  _ChoreBuilder(this._butler);
 
   _ChoreBuilder _func(f(int time)) {
     _choreItem._func = f;
@@ -103,9 +103,9 @@ class _ChoreBuilder {
     _choreItem
       ..mark = internalMark
       ..timesRemaining =
-          butler.timesRemaining(internalMark) ?? _choreItem._times
+          _butler.timesRemaining(internalMark) ?? _choreItem._times
       ..done = _choreItem.timesRemaining == 0;
-    return _ChoreRunner(_choreItem, butler);
+    return _ChoreRunner(_choreItem, _butler);
   }
 }
 

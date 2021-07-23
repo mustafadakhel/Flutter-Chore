@@ -31,10 +31,12 @@ class Chore {
     f(int time), {
     int times = 1,
   }) {
+    _assertInitialized();
     return _instance._newChore(mark, f, times: times);
   }
 
   static _ChoreFuncBuilder builder() {
+    _assertInitialized();
     return _instance._builder();
   }
 
@@ -54,14 +56,17 @@ class Chore {
   }
 
   static _ChoreRunner once(String mark, f()) {
+    _assertInitialized();
     return _instance._once(mark, f);
   }
 
   static _ChoreRunner twice(String mark, f(int time)) {
+    _assertInitialized();
     return _instance._twice(mark, f);
   }
 
   static _ChoreRunner thrice(String mark, f(int time)) {
+    _assertInitialized();
     return _instance._thrice(mark, f);
   }
 
@@ -89,11 +94,16 @@ class Chore {
   }
 
   static List<ChoreItem> getAllChores() {
+    _assertInitialized();
     return _instance._getAllChores();
   }
 
   List<ChoreItem> _getAllChores() {
     return _butler?.getAllChores() ?? [];
+  }
+
+  static _assertInitialized() {
+    if (_butler == null) throw Exception("Chore has not been initialized");
   }
 }
 

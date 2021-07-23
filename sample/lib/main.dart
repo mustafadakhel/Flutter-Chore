@@ -34,11 +34,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    Chore.executeOnce("sample", () {
+    Chore.invokeOnce(() {
       setState(() {
         text = "This is your first time";
       });
-    });
+    }).mark("mark").run();
     super.initState();
   }
 

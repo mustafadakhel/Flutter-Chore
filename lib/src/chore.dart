@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'better_try_catch.dart';
 
 class Chore {
-  static _OperationsHandler? _operator;
+  static _ChoreButler? butler;
 
   static final Chore _instance = Chore._internal();
 
@@ -21,128 +21,180 @@ class Chore {
 
   _init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _operator = _ChoreOperator(prefs);
+    butler = _ChoreButler(prefs);
   }
 
-  static _ChoreBuilder executeOnce(String mark, block()) {
-    return _instance._executeOnce(mark, block);
+  static _ChoreBuilder invoke(f()) {
+    return _instance._invoke(f);
   }
 
-  static List<_Operation> getAllOperations() {
-    _assertInitialized();
-    return _instance._getAllOperations();
+  static _ChoreBuilder invokeOnce(f()) {
+    return _instance._invokeOnce(f);
   }
 
-  static bool isExecuted(String mark) {
-    _assertInitialized();
-    return _instance._isExecuted(mark);
+  static _ChoreBuilder invokeTwice(f()) {
+    return _instance._invokeTwice(f);
   }
 
-  static _assertInitialized() {
-    assert(_operator != null, "Chore has not been initialized");
+  static _ChoreBuilder invokeThrice(f()) {
+    return invokeThrice(f);
   }
 
-  _ChoreBuilder _executeOnce(String mark, Function() block) {
-    return _ChoreBuilder.withMark(mark)._executeOnce(block);
+  _ChoreBuilder _invoke(f()) {
+    return _ChoreBuilder(butler!)._func(f);
   }
 
-  List<_Operation> _getAllOperations() {
-    return _operator!.getAllOperations();
+  _ChoreBuilder _invokeOnly(f(), int times) {
+    return _invoke(f).times(times);
   }
 
-  bool _isExecuted(String mark) {
-    return _operator!.isExecuted(mark);
-  }
-}
-
-class _Operation {
-  String mark;
-  bool executed;
-
-  _Operation._(this.mark, this.executed);
-
-  static _Operation fromMark(String mark) {
-    String internalMark = "flutter.chore.$mark";
-    bool executed = Chore._operator?.isExecuted(internalMark) ?? false;
-    return _Operation._(internalMark, executed);
+  _ChoreBuilder _invokeOnce(f()) {
+    return _invoke(f).once();
   }
 
-  @override
-  String toString() {
-    return "Operation( mark = $mark, executed = $executed)";
+  _ChoreBuilder _invokeTwice(f()) {
+    return _invoke(f).twice();
+  }
+
+  _ChoreBuilder _invokeThrice(f()) {
+    return _invoke(f).thrice();
+  }
+
+  static List<ChoreItem> getAllChores() {
+    return _instance._getAllChores();
+  }
+
+  List<ChoreItem> _getAllChores() {
+    return butler?.getAllChores() ?? [];
   }
 }
 
 class _ChoreBuilder {
-  _Operation _operation;
+  late ChoreItem _choreItem = ChoreItem._empty();
+  _ChoreButler butler;
 
-  _ChoreBuilder._(this._operation) {
-    _alreadyExecuted = _operation.executed;
-  }
+  _ChoreBuilder(this.butler);
 
-  bool _alreadyExecuted = false;
-
-  static _ChoreBuilder withMark(String mark) {
-    return _ChoreBuilder._(_Operation.fromMark(mark));
-  }
-
-  bool _isExecuted() {
-    return _alreadyExecuted;
-  }
-
-  _ChoreBuilder _setExecuted() {
-    Chore._operator?.setExecuted(_operation);
+  _ChoreBuilder _func(f()) {
+    _choreItem._func = f;
     return this;
   }
 
-  _ChoreBuilder _executeOnce(block()) {
-    Chore._operator?.executeOnce(_operation, block);
+  _ChoreBuilder times(int times) {
+    _choreItem._times = times;
     return this;
   }
 
-  alreadyExecuted(operation()) {
-    if (_alreadyExecuted) operation();
+  _ChoreBuilder once() {
+    _choreItem._times = 1;
+    return this;
+  }
+
+  _ChoreBuilder twice() {
+    _choreItem._times = 2;
+    return this;
+  }
+
+  _ChoreBuilder thrice() {
+    _choreItem._times = 3;
+    return this;
+  }
+
+  _ChoreRunner mark(String mark) {
+    String internalMark = "flutter.chore.$mark";
+    _choreItem
+      ..mark = internalMark
+      ..timesRemaining = butler.timesRemaining(internalMark) ?? _choreItem._times
+      ..done = _choreItem.timesRemaining == 0;
+    return _ChoreRunner(_choreItem, butler);
   }
 }
 
-class _ChoreOperator implements _OperationsHandler {
+class _ChoreRunner {
+  ChoreItem _choreItem;
+  _ChoreButler _butler;
+
+  _ChoreRunner(this._choreItem, this._butler);
+
+  run() {
+    _butler.run(_choreItem);
+  }
+}
+
+class ChoreItem {
+  late Function() _func;
+  late String mark;
+  late bool done;
+  int timesRemaining = 1;
+  int _times = 1;
+
+  ChoreItem._withTimesRemaining(
+      {required this.timesRemaining, required this.mark}) {
+    this.done = timesRemaining == 0;
+  }
+
+  ChoreItem._empty();
+
+  @override
+  String toString() {
+    String className = runtimeType.toString();
+    return "$className( mark = $mark, timesRemaining=$timesRemaining, executed = $done)";
+  }
+}
+
+class _ChoreButler {
   SharedPreferences prefs;
 
-  _ChoreOperator(this.prefs);
+  _ChoreButler(this.prefs);
 
-  @override
-  bool isExecuted(String mark) {
-    return prefs.getBool(mark) ?? false;
+  decreaseTimes(ChoreItem choreItem) {
+    if (choreItem.timesRemaining != 0)
+      prefs.setInt(choreItem.mark, choreItem.timesRemaining - 1);
   }
 
-  @override
-  setExecuted(_Operation operation) {
-    prefs.setBool(operation.mark, true);
-    operation.executed = true;
+  bool isDone(ChoreItem choreItem) {
+    int? times = prefs.getInt(choreItem.mark);
+    if (times == null) registerChore(choreItem);
+    return timesRemaining(choreItem.mark)! == 0;
   }
 
-  @override
-  executeOnce(_Operation operation, block) {
-    if (!isExecuted(operation.mark))
-      runCatching(block).onSuccess((value) {
-        setExecuted(operation);
+  setDone(ChoreItem choreItem) {
+    prefs.setInt(choreItem.mark, 0);
+    choreItem.done = true;
+  }
+
+  run(ChoreItem choreItem) {
+    if (!isDone(choreItem))
+      runCatching(choreItem._func).onSuccess((value) {
+        decreaseTimes(choreItem);
       });
   }
 
-  @override
-  List<_Operation> getAllOperations() {
-    return prefs.getKeys().map((String key) {
-      return _Operation.fromMark(key);
-    }).toList();
+  List<ChoreItem> getAllChores() {
+    return prefs
+        .getKeys()
+        .where((String key) => key.startsWith("flutter.chore."))
+        .map(
+          (String mark) => ChoreItem._withTimesRemaining(
+              timesRemaining: timesRemaining(mark) ?? 1, mark: mark)
+            ..mark = mark,
+        )
+        .toList();
   }
-}
 
-abstract class _OperationsHandler {
-  bool isExecuted(String mark);
+  int? timesRemaining(String mark) {
+    return prefs.getInt(mark);
+  }
 
-  setExecuted(_Operation operation);
+  registerChore(ChoreItem choreItem) {
+    prefs.setInt(choreItem.mark, choreItem._times);
+  }
 
-  executeOnce(_Operation operation, block);
-
-  List<_Operation> getAllOperations();
+  ChoreItem getChoreItemWithMark(String mark) {
+    int times = timesRemaining(mark) ?? 1;
+    ChoreItem item =
+        ChoreItem._withTimesRemaining(timesRemaining: times, mark: mark);
+    item..done = isDone(item);
+    return item;
+  }
 }

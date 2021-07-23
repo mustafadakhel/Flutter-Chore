@@ -5,7 +5,7 @@ import 'better_try_catch.dart';
 const String _base_key = "flutter.chore.";
 
 class Chore {
-  static _ChoreButler? butler;
+  static _ChoreButler? _butler;
 
   static final Chore _instance = Chore._internal();
 
@@ -23,7 +23,7 @@ class Chore {
 
   _init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    butler = _ChoreButler(prefs);
+    _butler = _ChoreButler(prefs);
   }
 
   static _ChoreBuilder invoke(f(int time)) {
@@ -43,7 +43,7 @@ class Chore {
   }
 
   _ChoreBuilder _invoke(f(int time)) {
-    return _ChoreBuilder(butler!)._func(f);
+    return _ChoreBuilder(_butler!)._func(f);
   }
 
   _ChoreBuilder _invokeOnce(f()) {
@@ -63,7 +63,7 @@ class Chore {
   }
 
   List<ChoreItem> _getAllChores() {
-    return butler?.getAllChores() ?? [];
+    return _butler?.getAllChores() ?? [];
   }
 }
 

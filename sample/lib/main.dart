@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boot/flutter_boot.dart';
+import 'package:flutter_chore/flutter_chore.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Boot.init();
+  await Chore.init();
   runApp(MyApp());
 }
 
@@ -11,11 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Boot Demo',
+      title: 'Chore Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Boot Demo'),
+      home: MyHomePage(title: 'Chore Demo'),
     );
   }
 }
@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    Boot.executeOnce("sample", () {
+    Chore.executeOnce("sample", () {
       setState(() {
         text = "This is your first time";
       });

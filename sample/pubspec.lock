@@ -69,7 +69,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_boot:
+  flutter_chore:
     dependency: "direct main"
     description:
       path: ".."

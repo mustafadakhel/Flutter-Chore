@@ -2,18 +2,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'better_try_catch.dart';
 
-class Boot {
+class Chore {
   static _OperationsHandler? _operator;
 
-  static final Boot _instance = Boot._internal();
+  static final Chore _instance = Chore._internal();
 
-  Boot._();
+  Chore._();
 
-  factory Boot() {
+  factory Chore() {
     return _instance;
   }
 
-  Boot._internal();
+  Chore._internal();
 
   static init() async {
     await _instance._init();
@@ -21,10 +21,10 @@ class Boot {
 
   _init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _operator = _BootOperator(prefs);
+    _operator = _ChoreOperator(prefs);
   }
 
-  static _BootBuilder executeOnce(String mark, block()) {
+  static _ChoreBuilder executeOnce(String mark, block()) {
     return _instance._executeOnce(mark, block);
   }
 
@@ -39,11 +39,11 @@ class Boot {
   }
 
   static _assertInitialized() {
-    assert(_operator != null, "Boot has not been initialized");
+    assert(_operator != null, "Chore has not been initialized");
   }
 
-  _BootBuilder _executeOnce(String mark, Function() block) {
-    return _BootBuilder.withMark(mark)._executeOnce(block);
+  _ChoreBuilder _executeOnce(String mark, Function() block) {
+    return _ChoreBuilder.withMark(mark)._executeOnce(block);
   }
 
   List<_Operation> _getAllOperations() {
@@ -62,8 +62,8 @@ class _Operation {
   _Operation._(this.mark, this.executed);
 
   static _Operation fromMark(String mark) {
-    String internalMark = "flutter.boot.$mark";
-    bool executed = Boot._operator?.isExecuted(internalMark) ?? false;
+    String internalMark = "flutter.chore.$mark";
+    bool executed = Chore._operator?.isExecuted(internalMark) ?? false;
     return _Operation._(internalMark, executed);
   }
 
@@ -73,30 +73,30 @@ class _Operation {
   }
 }
 
-class _BootBuilder {
+class _ChoreBuilder {
   _Operation _operation;
 
-  _BootBuilder._(this._operation) {
+  _ChoreBuilder._(this._operation) {
     _alreadyExecuted = _operation.executed;
   }
 
   bool _alreadyExecuted = false;
 
-  static _BootBuilder withMark(String mark) {
-    return _BootBuilder._(_Operation.fromMark(mark));
+  static _ChoreBuilder withMark(String mark) {
+    return _ChoreBuilder._(_Operation.fromMark(mark));
   }
 
   bool _isExecuted() {
     return _alreadyExecuted;
   }
 
-  _BootBuilder _setExecuted() {
-    Boot._operator?.setExecuted(_operation);
+  _ChoreBuilder _setExecuted() {
+    Chore._operator?.setExecuted(_operation);
     return this;
   }
 
-  _BootBuilder _executeOnce(block()) {
-    Boot._operator?.executeOnce(_operation, block);
+  _ChoreBuilder _executeOnce(block()) {
+    Chore._operator?.executeOnce(_operation, block);
     return this;
   }
 
@@ -105,10 +105,10 @@ class _BootBuilder {
   }
 }
 
-class _BootOperator implements _OperationsHandler {
+class _ChoreOperator implements _OperationsHandler {
   SharedPreferences prefs;
 
-  _BootOperator(this.prefs);
+  _ChoreOperator(this.prefs);
 
   @override
   bool isExecuted(String mark) {

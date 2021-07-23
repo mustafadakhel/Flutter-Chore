@@ -1,5 +1,5 @@
 name: sample
-description: A sample app for the flutter boot package
+description: A sample app for the flutter chore package
 
 publish_to: 'none'
 version: 1.0.0+1
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_boot:
+  flutter_chore:
     path: ../
 
 dev_dependencies:

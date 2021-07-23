@@ -1,6 +1,6 @@
 # sample
 
-A sample app for the flutter boot package
+A sample app for the flutter chore package
 
 ## Getting Started
 

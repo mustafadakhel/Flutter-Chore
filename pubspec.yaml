@@ -1,7 +1,7 @@
-name: flutter_boot
-description: A flutter plugin for executing operations only once
+name: flutter_chore
+description: A flutter plugin for invoking operations once or only a specific amount of times
 version: 0.0.1
-homepage:
+publish_to: 'none'
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

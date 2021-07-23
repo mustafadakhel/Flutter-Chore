@@ -26,7 +26,7 @@ class Chore {
     _butler = _ChoreButler(prefs);
   }
 
-  static _ChoreBuilder invoke(f(int time)) {
+  static _ChoreTimesBuilder invoke(f(int time)) {
     return _instance._invoke(f);
   }
 
@@ -42,7 +42,7 @@ class Chore {
     return _instance._invokeThrice(f);
   }
 
-  _ChoreBuilder _invoke(f(int time)) {
+  _ChoreTimesBuilder _invoke(f(int time)) {
     return _ChoreBuilder(_butler!)._func(f);
   }
 
@@ -73,29 +73,9 @@ class _ChoreBuilder {
 
   _ChoreBuilder(this._butler);
 
-  _ChoreBuilder _func(f(int time)) {
+  _ChoreTimesBuilder _func(f(int time)) {
     _choreItem._func = f;
-    return this;
-  }
-
-  _ChoreBuilder times(int times) {
-    _choreItem._times = times;
-    return this;
-  }
-
-  _ChoreBuilder once() {
-    _choreItem._times = 1;
-    return this;
-  }
-
-  _ChoreBuilder twice() {
-    _choreItem._times = 2;
-    return this;
-  }
-
-  _ChoreBuilder thrice() {
-    _choreItem._times = 3;
-    return this;
+    return _ChoreTimesBuilder(this);
   }
 
   _ChoreRunner mark(String mark) {
@@ -106,6 +86,32 @@ class _ChoreBuilder {
           _butler.timesRemaining(internalMark) ?? _choreItem._times
       ..done = _choreItem.timesRemaining == 0;
     return _ChoreRunner(_choreItem, _butler);
+  }
+}
+
+class _ChoreTimesBuilder {
+  _ChoreBuilder _builder;
+
+  _ChoreTimesBuilder(this._builder);
+
+  _ChoreBuilder times(int times) {
+    _builder._choreItem._times = times;
+    return _builder;
+  }
+
+  _ChoreBuilder once() {
+    _builder._choreItem._times = 1;
+    return _builder;
+  }
+
+  _ChoreBuilder twice() {
+    _builder._choreItem._times = 2;
+    return _builder;
+  }
+
+  _ChoreBuilder thrice() {
+    _builder._choreItem._times = 3;
+    return _builder;
   }
 }
 

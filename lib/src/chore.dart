@@ -26,8 +26,29 @@ class Chore {
     _butler = _ChoreButler(prefs);
   }
 
-  static _ChoreTimesBuilder invoke(f(int time)) {
-    return _instance._invoke(f);
+  static _ChoreRunner newChore(String mark,
+      f(int time), {
+        int times = 1,
+      }) {
+    return _instance._newChore(mark, f, times: times);
+  }
+
+  static _ChoreFuncBuilder builder() {
+    return _instance._builder();
+  }
+
+  _ChoreRunner _newChore(String mark,
+      Function(int time) f, {
+        int times = 1,
+      }) {
+    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+        .invoke(f)
+        .times(times)
+        .mark(mark);
+  }
+
+  _ChoreFuncBuilder _builder() {
+    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
   }
 
   static _ChoreBuilder invokeOnce(f()) {
@@ -43,7 +64,7 @@ class Chore {
   }
 
   _ChoreTimesBuilder _invoke(f(int time)) {
-    return _ChoreBuilder(_butler!)._func(f);
+    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!)).invoke(f);
   }
 
   _ChoreBuilder _invokeOnce(f()) {
@@ -65,6 +86,7 @@ class Chore {
   List<ChoreItem> _getAllChores() {
     return _butler?.getAllChores() ?? [];
   }
+
 }
 
 class _ChoreBuilder {
@@ -72,11 +94,6 @@ class _ChoreBuilder {
   _ChoreButler _butler;
 
   _ChoreBuilder(this._butler);
-
-  _ChoreTimesBuilder _func(f(int time)) {
-    _choreItem._func = f;
-    return _ChoreTimesBuilder(this);
-  }
 
   _ChoreRunner mark(String mark) {
     String internalMark = "$_base_key$mark";
@@ -89,10 +106,21 @@ class _ChoreBuilder {
   }
 }
 
+class _ChoreFuncBuilder {
+  _ChoreBuilder _builder;
+
+  _ChoreFuncBuilder.withBuilder(this._builder);
+
+  _ChoreTimesBuilder invoke(f(int time)) {
+    _builder._choreItem._func = f;
+    return _ChoreTimesBuilder.withBuilder(_builder);
+  }
+}
+
 class _ChoreTimesBuilder {
   _ChoreBuilder _builder;
 
-  _ChoreTimesBuilder(this._builder);
+  _ChoreTimesBuilder.withBuilder(this._builder);
 
   _ChoreBuilder times(int times) {
     _builder._choreItem._times = times;
@@ -193,10 +221,10 @@ class _ChoreButler {
   ChoreItem run(ChoreItem choreItem) {
     if (!isDone(choreItem))
       return runCatching(() {
-            choreItem._func(choreItem._times - (choreItem.timesRemaining - 1));
-          }).onSuccess((value) {
-            return decreaseTimes(choreItem);
-          }).getOrNull() ??
+        choreItem._func(choreItem._times - (choreItem.timesRemaining - 1));
+      }).onSuccess((value) {
+        return decreaseTimes(choreItem);
+      }).getOrNull() ??
           choreItem;
     else
       return choreItem;
@@ -207,10 +235,11 @@ class _ChoreButler {
         .getKeys()
         .where((String key) => key.startsWith("$_base_key"))
         .map(
-          (String mark) => ChoreItem._withTimesRemaining(
-              timesRemaining: timesRemaining(mark) ?? 1, mark: mark)
-            ..mark = mark,
-        )
+          (String mark) =>
+      ChoreItem._withTimesRemaining(
+          timesRemaining: timesRemaining(mark) ?? 1, mark: mark)
+        ..mark = mark,
+    )
         .toList();
   }
 

@@ -34,23 +34,30 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    Chore.invoke((int time) {
-      setState(() {
-        text = "Time $time";
-      });
-    }).times(5).mark("mark").run().onSecondTime(() {
-      setState(() {
-        text = "This is your second time";
-      });
-    }).beforeLastTime(() {
-      setState(() {
-        text = "This is your fourth time";
-      });
-    }).ifDone(() {
-      setState(() {
-        text = "Everything is done";
-      });
-    });
+    Chore.builder()
+        .invoke((int time) {
+          setState(() {
+            text = "Time $time";
+          });
+        })
+        .times(5)
+        .mark("mark")
+        .run()
+        .onSecondTime(() {
+          setState(() {
+            text = "This is your second time";
+          });
+        })
+        .beforeLastTime(() {
+          setState(() {
+            text = "This is your fourth time";
+          });
+        })
+        .ifDone(() {
+          setState(() {
+            text = "Everything is done";
+          });
+        });
     super.initState();
   }
 

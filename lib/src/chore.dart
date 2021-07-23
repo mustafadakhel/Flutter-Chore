@@ -2,6 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'better_try_catch.dart';
 
+const String _base_key = "flutter.chore.";
+
 class Chore {
   static _ChoreButler? butler;
 
@@ -24,7 +26,7 @@ class Chore {
     butler = _ChoreButler(prefs);
   }
 
-  static _ChoreBuilder invoke(f()) {
+  static _ChoreBuilder invoke(f(int time)) {
     return _instance._invoke(f);
   }
 
@@ -32,27 +34,27 @@ class Chore {
     return _instance._invokeOnce(f);
   }
 
-  static _ChoreBuilder invokeTwice(f()) {
+  static _ChoreBuilder invokeTwice(f(int time)) {
     return _instance._invokeTwice(f);
   }
 
-  static _ChoreBuilder invokeThrice(f()) {
+  static _ChoreBuilder invokeThrice(f(int time)) {
     return _instance._invokeThrice(f);
   }
 
-  _ChoreBuilder _invoke(f()) {
+  _ChoreBuilder _invoke(f(int time)) {
     return _ChoreBuilder(butler!)._func(f);
   }
 
   _ChoreBuilder _invokeOnce(f()) {
-    return _invoke(f).once();
+    return _invoke((_) => f()).once();
   }
 
-  _ChoreBuilder _invokeTwice(f()) {
+  _ChoreBuilder _invokeTwice(f(int time)) {
     return _invoke(f).twice();
   }
 
-  _ChoreBuilder _invokeThrice(f()) {
+  _ChoreBuilder _invokeThrice(f(int time)) {
     return _invoke(f).thrice();
   }
 
@@ -71,7 +73,7 @@ class _ChoreBuilder {
 
   _ChoreBuilder(this.butler);
 
-  _ChoreBuilder _func(f()) {
+  _ChoreBuilder _func(f(int time)) {
     _choreItem._func = f;
     return this;
   }
@@ -97,7 +99,7 @@ class _ChoreBuilder {
   }
 
   _ChoreRunner mark(String mark) {
-    String internalMark = "flutter.chore.$mark";
+    String internalMark = "$_base_key$mark";
     _choreItem
       ..mark = internalMark
       ..timesRemaining =
@@ -113,17 +115,41 @@ class _ChoreRunner {
 
   _ChoreRunner(this._choreItem, this._butler);
 
-  run() {
-    _butler.run(_choreItem);
+  _ChoreJanitor run() {
+    _choreItem = _butler.run(_choreItem);
+    return _ChoreJanitor(_choreItem);
+  }
+}
+
+class _ChoreJanitor {
+  ChoreItem _choreItem;
+
+  _ChoreJanitor(this._choreItem);
+
+  _ChoreJanitor afterLastTime(func()) {
+    if (_choreItem.done) func();
+    return this;
+  }
+
+  _ChoreJanitor beforeLastTime(func()) {
+    if (_choreItem.timesRemaining == 1) func();
+    return this;
+  }
+
+  _ChoreJanitor onSecondTime(func()) {
+    if (_choreItem.timesRemaining == _choreItem._times - 2) func();
+    return this;
   }
 }
 
 class ChoreItem {
-  late Function() _func;
+  late Function(int time) _func;
   late String mark;
   late bool done;
   int timesRemaining = 1;
   int _times = 1;
+
+  ChoreItem._();
 
   ChoreItem._withTimesRemaining(
       {required this.timesRemaining, required this.mark}) {
@@ -144,28 +170,36 @@ class _ChoreButler {
 
   _ChoreButler(this.prefs);
 
-  decreaseTimes(ChoreItem choreItem) {
-    if (choreItem.timesRemaining != 0)
-      prefs.setInt(choreItem.mark, choreItem.timesRemaining - 1);
+  ChoreItem decreaseTimes(ChoreItem choreItem) {
+    if (!choreItem.done) {
+      choreItem.timesRemaining -= 1;
+      prefs.setInt(choreItem.mark, choreItem.timesRemaining);
+    }
+    return choreItem;
   }
 
   bool isDone(ChoreItem choreItem) {
-    int? times = prefs.getInt(choreItem.mark);
+    int? times = timesRemaining(choreItem.mark);
     if (times == null) registerChore(choreItem);
     return timesRemaining(choreItem.mark)! == 0;
   }
 
-  run(ChoreItem choreItem) {
+  ChoreItem run(ChoreItem choreItem) {
     if (!isDone(choreItem))
-      runCatching(choreItem._func).onSuccess((value) {
-        decreaseTimes(choreItem);
-      });
+      return runCatching(() {
+            choreItem._func(choreItem._times - (choreItem.timesRemaining - 1));
+          }).onSuccess((value) {
+            return decreaseTimes(choreItem);
+          }).getOrNull() ??
+          choreItem;
+    else
+      return choreItem;
   }
 
   List<ChoreItem> getAllChores() {
     return prefs
         .getKeys()
-        .where((String key) => key.startsWith("flutter.chore."))
+        .where((String key) => key.startsWith("$_base_key"))
         .map(
           (String mark) => ChoreItem._withTimesRemaining(
               timesRemaining: timesRemaining(mark) ?? 1, mark: mark)

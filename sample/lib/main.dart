@@ -30,15 +30,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String text = "This is not your first time";
+  String text = "";
 
   @override
   void initState() {
-    Chore.invokeOnce(() {
+    Chore.invoke((int time) {
       setState(() {
-        text = "This is your first time";
+        text = "Time $time";
       });
-    }).mark("mark").run();
+    }).times(5).mark("mark").run().onSecondTime(() {
+      setState(() {
+        text = "This is your second time";
+      });
+    }).beforeLastTime(() {
+      setState(() {
+        text = "This is your fourth time";
+      });
+    }).afterLastTime(() {
+      setState(() {
+        text = "Everything is done";
+      });
+    });
     super.initState();
   }
 

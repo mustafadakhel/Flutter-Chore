@@ -26,10 +26,11 @@ class Chore {
     _butler = _ChoreButler(prefs);
   }
 
-  static _ChoreRunner newChore(String mark,
-      f(int time), {
-        int times = 1,
-      }) {
+  static _ChoreRunner newChore(
+    String mark,
+    f(int time), {
+    int times = 1,
+  }) {
     return _instance._newChore(mark, f, times: times);
   }
 
@@ -37,10 +38,11 @@ class Chore {
     return _instance._builder();
   }
 
-  _ChoreRunner _newChore(String mark,
-      Function(int time) f, {
-        int times = 1,
-      }) {
+  _ChoreRunner _newChore(
+    String mark,
+    Function(int time) f, {
+    int times = 1,
+  }) {
     return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
         .invoke(f)
         .times(times)
@@ -48,35 +50,42 @@ class Chore {
   }
 
   _ChoreFuncBuilder _builder() {
+    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!));
+  }
+
+  static _ChoreRunner once(String mark, f()) {
+    return _instance._once(mark, f);
+  }
+
+  static _ChoreRunner twice(String mark, f(int time)) {
+    return _instance._twice(mark, f);
+  }
+
+  static _ChoreRunner thrice(String mark, f(int time)) {
+    return _instance._thrice(mark, f);
+  }
+
+  _ChoreRunner _once(String mark, f()) {
     return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+        .invoke((_) {
+          f();
+        })
+        .once()
+        .mark(mark);
   }
 
-  static _ChoreBuilder invokeOnce(f()) {
-    return _instance._invokeOnce(f);
+  _ChoreRunner _twice(String mark, f(int time)) {
+    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+        .invoke(f)
+        .twice()
+        .mark(mark);
   }
 
-  static _ChoreBuilder invokeTwice(f(int time)) {
-    return _instance._invokeTwice(f);
-  }
-
-  static _ChoreBuilder invokeThrice(f(int time)) {
-    return _instance._invokeThrice(f);
-  }
-
-  _ChoreTimesBuilder _invoke(f(int time)) {
-    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!)).invoke(f);
-  }
-
-  _ChoreBuilder _invokeOnce(f()) {
-    return _invoke((_) => f()).once();
-  }
-
-  _ChoreBuilder _invokeTwice(f(int time)) {
-    return _invoke(f).twice();
-  }
-
-  _ChoreBuilder _invokeThrice(f(int time)) {
-    return _invoke(f).thrice();
+  _ChoreRunner _thrice(String mark, f(int time)) {
+    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+        .invoke(f)
+        .twice()
+        .mark(mark);
   }
 
   static List<ChoreItem> getAllChores() {
@@ -86,7 +95,6 @@ class Chore {
   List<ChoreItem> _getAllChores() {
     return _butler?.getAllChores() ?? [];
   }
-
 }
 
 class _ChoreBuilder {
@@ -221,10 +229,10 @@ class _ChoreButler {
   ChoreItem run(ChoreItem choreItem) {
     if (!isDone(choreItem))
       return runCatching(() {
-        choreItem._func(choreItem._times - (choreItem.timesRemaining - 1));
-      }).onSuccess((value) {
-        return decreaseTimes(choreItem);
-      }).getOrNull() ??
+            choreItem._func(choreItem._times - (choreItem.timesRemaining - 1));
+          }).onSuccess((value) {
+            return decreaseTimes(choreItem);
+          }).getOrNull() ??
           choreItem;
     else
       return choreItem;
@@ -235,11 +243,10 @@ class _ChoreButler {
         .getKeys()
         .where((String key) => key.startsWith("$_base_key"))
         .map(
-          (String mark) =>
-      ChoreItem._withTimesRemaining(
-          timesRemaining: timesRemaining(mark) ?? 1, mark: mark)
-        ..mark = mark,
-    )
+          (String mark) => ChoreItem._withTimesRemaining(
+              timesRemaining: timesRemaining(mark) ?? 1, mark: mark)
+            ..mark = mark,
+        )
         .toList();
   }
 

@@ -38,7 +38,7 @@
             // do something only 4 times
           },
           times: 4,
-        ).run()
+        ).run();
 ```
 2.2.2 Using the Chore.builder method:
 ```dart
@@ -48,7 +48,7 @@
          })
          .times(4)
          .mark("mark")
-         .run()
+         .run();
 ```
 other methods:
 ```dart
@@ -113,7 +113,7 @@ Chore.newChore(
 
 # License
 ```xml
-Copyright 2021 mustafadakhel
+Copyright 2021 mustafadakhel (Mustafa Muhammed Dakhel)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

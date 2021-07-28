@@ -1,11 +1,14 @@
 # flutter_chore
-
-A flutter package for invoking a certain block of code only a fixed amount of times
+<p align="center">
+  <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
+  <p align="center">
+  A flutter package for invoking a certain block of code only a fixed amount of times.
+  </p>
 
 ## 1. Installation
 
 1.1.1 Add flutter_chore to your pubspec.yaml file:
-```
+```yaml
     dependencies:
         flutter_chore:
             git:
@@ -18,17 +21,17 @@ A flutter package for invoking a certain block of code only a fixed amount of ti
 
 ### 2.1 Initialize the package
 2.1.1 Import Flutter Chore with:
-```
+```dart
     import 'package:flutter_chore/flutter_chore.dart';
 ```
 2.1.2 Initialize the package:
-```
+```dart
     await Chore.init();
 ```
 
 ### 2.2 Use the package
 2.2.1 Using the Chore.newChore method:
-```
+```dart
     Chore.newChore(
           "chore_mark",
           (int time) {
@@ -38,7 +41,7 @@ A flutter package for invoking a certain block of code only a fixed amount of ti
         ).run()
 ```
 2.2.2 Using the Chore.builder method:
-```
+```dart
     Chore.builder()
          .invoke((int time) {
             // do something only 4 times
@@ -48,7 +51,7 @@ A flutter package for invoking a certain block of code only a fixed amount of ti
          .run()
 ```
 other methods:
-```
+```dart
     Chore.builder()
          .invoke((int time) {
             // do something only 1 time
@@ -74,7 +77,7 @@ other methods:
         .run();
 ```
 2.2.3 Using the once, twice, and thrice methods:
-```
+```dart
     Chore.once("chore_mark", () {
           // do something only 1 time
         }).run();
@@ -88,7 +91,7 @@ other methods:
         }).run();
 ```
 2.2.4 Listen for events:
-```
+```dart
 Chore.newChore(
       "chore_mark",
       (time) {
@@ -104,11 +107,12 @@ Chore.newChore(
     });
 ```
 2.2.3 Get a list of all registered chores:
-```
+```dart
     List<ChoreItem> chores = Chore.getAllChores();
 ```
 
 # License
+```xml
 Copyright 2021 mustafadakhel
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -122,3 +126,4 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```

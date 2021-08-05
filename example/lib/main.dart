@@ -1,8 +1,3 @@
-import 'package:example/all_chores_page.dart';
-import 'package:example/five_times_chore_page.dart';
-import 'package:example/one_time_chore_page.dart';
-import 'package:example/three_times_chore_page.dart';
-import 'package:example/two_times_chore_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chore/flutter_chore.dart';
 
@@ -35,7 +30,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   void initState() {
     super.initState();
@@ -122,5 +116,234 @@ class _MyHomePageState extends State<MyHomePage> {
         }
     }
     Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  }
+}
+
+class OneTimeChorePage extends StatefulWidget {
+  const OneTimeChorePage({Key? key}) : super(key: key);
+
+  @override
+  _OneTimeChorePageState createState() => _OneTimeChorePageState();
+}
+
+class _OneTimeChorePageState extends State<OneTimeChorePage> {
+  String text = "";
+
+  @override
+  void initState() {
+    runOnce();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("One times"),
+      ),
+      body: Center(child: Text(text)),
+    );
+  }
+
+  runOnce() {
+    Chore.once("one_time_chore", () {
+      setState(() {
+        text = "This is your first time";
+      });
+    }).run().ifDone(() {
+      setState(() {
+        text = "Everything is done";
+      });
+    });
+  }
+}
+
+class TwoTimesChorePage extends StatefulWidget {
+  const TwoTimesChorePage({Key? key}) : super(key: key);
+
+  @override
+  _TwoTimesChorePageState createState() => _TwoTimesChorePageState();
+}
+
+class _TwoTimesChorePageState extends State<TwoTimesChorePage> {
+  String text = "";
+
+  @override
+  void initState() {
+    runTwoTimes();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Two times"),
+      ),
+      body: Center(child: Text(text)),
+    );
+  }
+
+  runTwoTimes() {
+    Chore.twice("two_times_chore", (int time) {
+      setState(() {
+        text = "Time $time";
+      });
+    }).run().beforeLastTime(() {
+      setState(() {
+        text = "This is your first time";
+      });
+    }).onSecondTime(() {
+      setState(() {
+        text = "This is your second time";
+      });
+    }).ifDone(() {
+      setState(() {
+        text = "Everything is done";
+      });
+    });
+  }
+}
+
+class ThreeTimesChorePage extends StatefulWidget {
+  const ThreeTimesChorePage({Key? key}) : super(key: key);
+
+  @override
+  _ThreeTimesChorePageState createState() => _ThreeTimesChorePageState();
+}
+
+class _ThreeTimesChorePageState extends State<ThreeTimesChorePage> {
+  String text = "";
+
+  @override
+  void initState() {
+    runThreeTimes();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Three times"),
+      ),
+      body: Center(child: Text(text)),
+    );
+  }
+
+  runThreeTimes() {
+    Chore.thrice("three_times_chore", (int time) {
+      setState(() {
+        text = "Time $time";
+      });
+    }).run().onSecondTime(() {
+      setState(() {
+        text = "This is your second time";
+      });
+    }).ifDone(() {
+      setState(() {
+        text = "Everything is done";
+      });
+    });
+  }
+}
+
+class FiveTimesChorePage extends StatefulWidget {
+  const FiveTimesChorePage({Key? key}) : super(key: key);
+
+  @override
+  _FiveTimesChorePageState createState() => _FiveTimesChorePageState();
+}
+
+class _FiveTimesChorePageState extends State<FiveTimesChorePage> {
+  String text = "";
+
+  @override
+  void initState() {
+    runFiveTimes();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Five times"),
+      ),
+      body: Center(child: Text(text)),
+    );
+  }
+
+  runFiveTimes() {
+    Chore.builder()
+        .invoke((int time) {
+          setState(() {
+            text = "Time $time";
+          });
+        })
+        .times(5)
+        .mark("five_times_chore")
+        .run()
+        .onSecondTime(() {
+          setState(() {
+            text = "This is your second time";
+          });
+        })
+        .beforeLastTime(() {
+          setState(() {
+            text = "This is your fourth time";
+          });
+        })
+        .ifDone(() {
+          setState(() {
+            text = "Everything is done";
+          });
+        });
+  }
+}
+
+class AllChoresPage extends StatefulWidget {
+  const AllChoresPage({Key? key}) : super(key: key);
+
+  @override
+  _AllChoresPageState createState() => _AllChoresPageState();
+}
+
+class _AllChoresPageState extends State<AllChoresPage> {
+  int choresCount = 0;
+  List<ChoreItem> chores = [];
+
+  @override
+  void initState() {
+    chores = Chore.getAllChores();
+    choresCount = chores.length;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("All chores"),
+      ),
+      body: ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        shrinkWrap: true,
+        primary: true,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              "Chore: ${chores[index].mark}\n"
+              "Times Remaining: ${chores[index].timesRemaining}\n"
+              "Done: ${chores[index].done}\n",
+              softWrap: true,
+              textAlign: TextAlign.center,
+            ),
+          );
+        },
+        itemCount: choresCount,
+      ),
+    );
   }
 }

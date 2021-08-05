@@ -7,15 +7,13 @@ const String _base_key = "flutter.chore.";
 class Chore {
   static _ChoreButler? _butler;
 
-  static final Chore _instance = Chore._internal();
+  static final Chore _instance = Chore._();
 
   Chore._();
 
   factory Chore() {
     return _instance;
   }
-
-  Chore._internal();
 
   static init() async {
     await _instance._init();
@@ -89,7 +87,7 @@ class Chore {
   _ChoreRunner _thrice(String mark, f(int time)) {
     return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
         .invoke(f)
-        .twice()
+        .thrice()
         .mark(mark);
   }
 
@@ -252,6 +250,7 @@ class _ChoreButler {
     return prefs
         .getKeys()
         .where((String key) => key.startsWith("$_base_key"))
+        .map((String mark) => mark.split('.').last)
         .map(
           (String mark) => ChoreItem._withTimesRemaining(
               timesRemaining: timesRemaining(mark) ?? 1, mark: mark)

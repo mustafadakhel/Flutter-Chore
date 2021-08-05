@@ -1,6 +1,6 @@
 name: flutter_chore
 description: A flutter plugin for invoking operations once or only a specific amount of times
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/mustafadakhel/Flutter-Chore
 
 environment:

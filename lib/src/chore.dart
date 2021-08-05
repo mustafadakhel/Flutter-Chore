@@ -4,6 +4,12 @@ import 'better_try_catch.dart';
 
 const String _base_key = "flutter.chore.";
 
+///  code block to be called when doing the chore
+///
+/// [time] the index of this time, meaning how many times the chore was
+/// done before including this one
+typedef F(int time);
+
 class Chore {
   static _ChoreButler? _butler;
 
@@ -31,22 +37,22 @@ class Chore {
   /// Registers a new chore
   ///
   /// Used to register a new chore with a unique [mark], the chore will
-  /// call the code block specified in the [f] parameter only as many
+  /// call the code block specified in the [F] parameter only as many
   /// times as specified in the [times] parameter which defaults to 1
   ///
   /// [mark] the unique mark for the chore
   /// [times] the number of times to do the chore (defaults to 1)
-  /// [f] the code block that is called only as many times as set in
+  /// [F] the code block that is called only as many times as set in
   /// the [times] parameter
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner newChore(
     String mark,
-    f(int time), {
+    F, {
     int times = 1,
   }) {
     _assertInitialized();
-    return _instance._newChore(mark, f, times: times);
+    return _instance._newChore(mark, F, times: times);
   }
 
   /// Registers a chore using a builder
@@ -79,10 +85,10 @@ class Chore {
   /// Registers a new chore that runs only once
   ///
   /// Used to register a new chore with a unique [mark], the chore will
-  /// call the code block specified in the [f] parameter only once
+  /// call the code block specified in the [F] parameter only once
   ///
   /// [mark] the unique mark for the chore
-  /// [f] the code block that is called only once
+  /// [F] the code block that is called only once
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner once(String mark, f()) {
@@ -93,50 +99,50 @@ class Chore {
   /// Registers a new chore that runs only twice
   ///
   /// Used to register a new chore with a unique [mark], the chore will
-  /// call the code block specified in the [f] parameter only twice
+  /// call the code block specified in the [F] parameter only twice
   ///
   /// [mark] the unique mark for the chore
-  /// [f] the code block that is called only twice
+  /// [F] the code block that is called only twice
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
-  static _ChoreRunner twice(String mark, f(int time)) {
+  static _ChoreRunner twice(String mark, F) {
     _assertInitialized();
-    return _instance._twice(mark, f);
+    return _instance._twice(mark, F);
   }
 
   /// Registers a new chore that runs only thrice
   ///
   /// Used to register a new chore with a unique [mark], the chore will
-  /// call the code block specified in the [f] parameter only thrice
+  /// call the code block specified in the [F] parameter only thrice
   ///
   /// [mark] the unique mark for the chore
-  /// [f] the code block that is called only thrice
+  /// [F] the code block that is called only thrice
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
-  static _ChoreRunner thrice(String mark, f(int time)) {
+  static _ChoreRunner thrice(String mark, F) {
     _assertInitialized();
-    return _instance._thrice(mark, f);
+    return _instance._thrice(mark, F);
   }
 
-  _ChoreRunner _once(String mark, f()) {
+  _ChoreRunner _once(String mark, F) {
     return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!))
         .invoke((_) {
-          f();
+          F();
         })
         .once()
         .mark(mark);
   }
 
-  _ChoreRunner _twice(String mark, f(int time)) {
+  _ChoreRunner _twice(String mark, F) {
     return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!))
-        .invoke(f)
+        .invoke(F)
         .twice()
         .mark(mark);
   }
 
-  _ChoreRunner _thrice(String mark, f(int time)) {
+  _ChoreRunner _thrice(String mark, F) {
     return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!))
-        .invoke(f)
+        .invoke(F)
         .thrice()
         .mark(mark);
   }
@@ -195,13 +201,13 @@ class _ChoreFuncBuilder {
   /// Used to set the code block that will be called only as many times
   /// as will be set later in the times parameter
   ///
-  /// [f] the code block that is called only as many times as will be set
+  /// [F] the code block that is called only as many times as will be set
   /// in the times parameter
   ///
   /// Returns a [_ChoreTimesBuilder] instance which enables you to set
   /// the number of times this code block should be called
-  _ChoreTimesBuilder invoke(f(int time)) {
-    _builder._choreItem._func = f;
+  _ChoreTimesBuilder invoke(F) {
+    _builder._choreItem._func = F;
     return _ChoreTimesBuilder._withBuilder(_builder);
   }
 }
@@ -272,7 +278,7 @@ class _ChoreRunner {
   ///
   /// If the chore has been previously done as many times as specified in
   /// the times parameter then invoke the [_ChoreJanitor.ifDone] method,
-  /// else call the code block that was specified in the f parameter
+  /// else call the code block that was specified in the [F] parameter
   ///
   /// Returns a [_ChoreJanitor] instance which enables you to observe
   /// the chore running stages

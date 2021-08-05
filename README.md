@@ -10,7 +10,7 @@
 1.1.1 Add flutter_chore to your pubspec.yaml file:
 ```yaml
     dependencies:
-        flutter_chore: 0.0.3
+        flutter_chore: 0.0.4
 ```
 1.1.2 Run flutter packages get to install the package.
 

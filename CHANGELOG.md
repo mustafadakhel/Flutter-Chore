@@ -10,3 +10,7 @@ Refactor example files.
 
 * Change f function parameter to a typedef.
 * Rename _base_key constant to _kBaseKey.
+
+## 0.0.4
+
+* Change the README.md file installation part to point to pub.

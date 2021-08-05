@@ -332,9 +332,16 @@ class _ChoreJanitor {
 
 class ChoreItem {
   late Function(int time) _func;
+
+  /// The unique mark that is used to identify the chore
   late String mark;
+
+  /// If the chore was already done as many times as specified
   late bool done;
+
+  /// The number of times remaining for the chore to be done
   int timesRemaining = 1;
+
   int _times = 1;
 
   ChoreItem._();
@@ -349,7 +356,7 @@ class ChoreItem {
   @override
   String toString() {
     String className = runtimeType.toString();
-    return "$className( mark = $mark, timesRemaining=$timesRemaining, executed = $done)";
+    return "$className( Mark = $mark, Times Remaining=$timesRemaining, Done = $done)";
   }
 }
 

@@ -30,11 +30,13 @@ class Chore {
 
   /// Registers a new chore
   ///
-  /// Used to register a new chore with a unique [mark]
+  /// Used to register a new chore with a unique [mark], the chore will
+  /// call the code block specified in the [f] parameter only as many
+  /// times as specified in the [times] parameter which defaults to 1
   ///
   /// [mark] the unique mark for the chore
   /// [times] the number of times to do the chore (defaults to 1)
-  /// [f] the method that is invoked only as many times as set in
+  /// [f] the code block that is called only as many times as set in
   /// the [times] parameter
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
@@ -53,7 +55,7 @@ class Chore {
   /// a new chore
   ///
   /// Returns a [_ChoreFuncBuilder] instance which enables you to set
-  /// the function to be invoked
+  /// the function to be called
   static _ChoreFuncBuilder builder() {
     _assertInitialized();
     return _instance._builder();
@@ -64,23 +66,23 @@ class Chore {
     Function(int time) f, {
     int times = 1,
   }) {
-    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+    return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!))
         .invoke(f)
         .times(times)
         .mark(mark);
   }
 
   _ChoreFuncBuilder _builder() {
-    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!));
+    return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!));
   }
 
   /// Registers a new chore that runs only once
   ///
-  /// Used to register a new chore that runs only once with
-  /// a unique [mark]
+  /// Used to register a new chore with a unique [mark], the chore will
+  /// call the code block specified in the [f] parameter only once
   ///
   /// [mark] the unique mark for the chore
-  /// [f] the method that is invoked only once
+  /// [f] the code block that is called only once
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner once(String mark, f()) {
@@ -90,11 +92,11 @@ class Chore {
 
   /// Registers a new chore that runs only twice
   ///
-  /// Used to register a new chore that runs only twice with
-  /// a unique [mark]
+  /// Used to register a new chore with a unique [mark], the chore will
+  /// call the code block specified in the [f] parameter only twice
   ///
   /// [mark] the unique mark for the chore
-  /// [f] the method that is invoked only twice
+  /// [f] the code block that is called only twice
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner twice(String mark, f(int time)) {
@@ -104,11 +106,11 @@ class Chore {
 
   /// Registers a new chore that runs only thrice
   ///
-  /// Used to register a new chore that runs only thrice with
-  /// a unique [mark]
+  /// Used to register a new chore with a unique [mark], the chore will
+  /// call the code block specified in the [f] parameter only thrice
   ///
   /// [mark] the unique mark for the chore
-  /// [f] the method that is invoked only thrice
+  /// [f] the code block that is called only thrice
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner thrice(String mark, f(int time)) {
@@ -117,7 +119,7 @@ class Chore {
   }
 
   _ChoreRunner _once(String mark, f()) {
-    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+    return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!))
         .invoke((_) {
           f();
         })
@@ -126,14 +128,14 @@ class Chore {
   }
 
   _ChoreRunner _twice(String mark, f(int time)) {
-    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+    return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!))
         .invoke(f)
         .twice()
         .mark(mark);
   }
 
   _ChoreRunner _thrice(String mark, f(int time)) {
-    return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!))
+    return _ChoreFuncBuilder._withBuilder(_ChoreBuilder(_butler!))
         .invoke(f)
         .thrice()
         .mark(mark);
@@ -187,8 +189,18 @@ class _ChoreBuilder {
 class _ChoreFuncBuilder {
   _ChoreBuilder _builder;
 
-  _ChoreFuncBuilder.withBuilder(this._builder);
+  _ChoreFuncBuilder._withBuilder(this._builder);
 
+  /// Set the code block to be called
+  ///
+  /// Used to set the code block that will be called only as many times
+  /// as will be set later in the times parameter
+  ///
+  /// [f] the code block that is called only as many times as will be set
+  /// in the times parameter
+  ///
+  /// Returns a [_ChoreTimesBuilder] instance which enables you to set
+  /// the number of times this code block should be run
   _ChoreTimesBuilder invoke(f(int time)) {
     _builder._choreItem._func = f;
     return _ChoreTimesBuilder.withBuilder(_builder);

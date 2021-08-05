@@ -167,7 +167,6 @@ class _ChoreBuilder {
 
   _ChoreBuilder(this._butler);
 
-
   /// Mark the chore with a unique identifier
   ///
   /// Used to set a unique mark to identify the chore
@@ -200,33 +199,63 @@ class _ChoreFuncBuilder {
   /// in the times parameter
   ///
   /// Returns a [_ChoreTimesBuilder] instance which enables you to set
-  /// the number of times this code block should be run
+  /// the number of times this code block should be called
   _ChoreTimesBuilder invoke(f(int time)) {
     _builder._choreItem._func = f;
-    return _ChoreTimesBuilder.withBuilder(_builder);
+    return _ChoreTimesBuilder._withBuilder(_builder);
   }
 }
 
 class _ChoreTimesBuilder {
   _ChoreBuilder _builder;
 
-  _ChoreTimesBuilder.withBuilder(this._builder);
+  _ChoreTimesBuilder._withBuilder(this._builder);
 
+  /// Set the number of times
+  ///
+  /// Used to set the number of times the previously specified code
+  /// block should be called
+  ///
+  /// [times] the number of times
+  ///
+  /// Returns a [_ChoreBuilder] instance which enables you to set
+  /// a unique mark for the chore
   _ChoreBuilder times(int times) {
     _builder._choreItem._times = times;
     return _builder;
   }
 
+  /// Set the chore to be done only once
+  ///
+  /// Used to specify that the previously specified code block should
+  /// be called only once
+  ///
+  /// Returns a [_ChoreBuilder] instance which enables you to set
+  /// a unique mark for the chore
   _ChoreBuilder once() {
     _builder._choreItem._times = 1;
     return _builder;
   }
 
+  /// Set the chore to be done only twice
+  ///
+  /// Used to specify that the previously specified code block should
+  /// be called only twice
+  ///
+  /// Returns a [_ChoreBuilder] instance which enables you to set
+  /// a unique mark for the chore
   _ChoreBuilder twice() {
     _builder._choreItem._times = 2;
     return _builder;
   }
 
+  /// Set the chore to be done only thrice
+  ///
+  /// Used to specify that the previously specified code block should
+  /// be called only thrice
+  ///
+  /// Returns a [_ChoreBuilder] instance which enables you to set
+  /// a unique mark for the chore
   _ChoreBuilder thrice() {
     _builder._choreItem._times = 3;
     return _builder;
@@ -239,6 +268,14 @@ class _ChoreRunner {
 
   _ChoreRunner(this._choreItem, this._butler);
 
+  /// Do the chore
+  ///
+  /// If the chore has been previously done as many times as specified in
+  /// the times parameter then invoke the [_ChoreJanitor.ifDone] method,
+  /// else call the code block that was specified in the f parameter
+  ///
+  /// Returns a [_ChoreJanitor] instance which enables you to observe
+  /// the chore running stages
   _ChoreJanitor run() {
     _choreItem = _butler.run(_choreItem);
     return _ChoreJanitor(_choreItem);
@@ -250,16 +287,43 @@ class _ChoreJanitor {
 
   _ChoreJanitor(this._choreItem);
 
+  /// Run a code block if the chore was done
+  ///
+  /// Used to set the code block to be called whenever the [_ChoreRunner.run]
+  /// was called but the chore was already done
+  ///
+  /// [func] the code block that is called if the chore was done
+  ///
+  /// Returns a [_ChoreJanitor] instance which enables you to set
+  /// more methods to observe the running steps
   _ChoreJanitor ifDone(func()) {
     if (_choreItem.done) func();
     return this;
   }
 
+  /// Run a code block before the last time
+  ///
+  /// Used to set the code block to be called when the chore has
+  /// only one time left to be done
+  ///
+  /// [func] the code block that is called before the last time
+  ///
+  /// Returns a [_ChoreJanitor] instance which enables you to set
+  /// more methods to observe the running steps
   _ChoreJanitor beforeLastTime(func()) {
     if (_choreItem.timesRemaining == 1) func();
     return this;
   }
 
+  /// Run a code block on the second time
+  ///
+  /// Used to set the code block to be called when this is the second
+  /// time the chore has been done
+  ///
+  /// [func] the code block that is called on the second time
+  ///
+  /// Returns a [_ChoreJanitor] instance which enables you to set
+  /// more methods to observe the running steps
   _ChoreJanitor onSecondTime(func()) {
     if (_choreItem.timesRemaining == _choreItem._times - 2) func();
     return this;

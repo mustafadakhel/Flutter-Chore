@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'better_try_catch.dart';
 
-const String _base_key = "flutter.chore.";
+const String _kBaseKey = "flutter.chore.";
 
 ///  code block to be called when doing the chore
 ///
@@ -181,7 +181,7 @@ class _ChoreBuilder {
   ///
   /// Returns a [_ChoreRunner] instance which enables you to run the chore
   _ChoreRunner mark(String mark) {
-    String internalMark = "$_base_key$mark";
+    String internalMark = "$_kBaseKey$mark";
     _choreItem
       ..mark = internalMark
       ..timesRemaining =
@@ -400,7 +400,7 @@ class _ChoreButler {
   List<ChoreItem> _getAllChores() {
     return prefs
         .getKeys()
-        .where((String key) => key.startsWith("$_base_key"))
+        .where((String key) => key.startsWith("$_kBaseKey"))
         .map(
           (String mark) => ChoreItem._withTimesRemaining(
               timesRemaining: _timesRemaining(mark) ?? 1, mark: mark)

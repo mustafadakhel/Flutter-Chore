@@ -153,7 +153,7 @@ class Chore {
   }
 
   List<ChoreItem> _getAllChores() {
-    return _butler?.getAllChores() ?? [];
+    return _butler?._getAllChores() ?? [];
   }
 
   static _assertInitialized() {
@@ -179,7 +179,7 @@ class _ChoreBuilder {
     _choreItem
       ..mark = internalMark
       ..timesRemaining =
-          _butler.timesRemaining(internalMark) ?? _choreItem._times
+          _butler._timesRemaining(internalMark) ?? _choreItem._times
       ..done = _choreItem.timesRemaining == 0;
     return _ChoreRunner(_choreItem, _butler);
   }
@@ -277,7 +277,7 @@ class _ChoreRunner {
   /// Returns a [_ChoreJanitor] instance which enables you to observe
   /// the chore running stages
   _ChoreJanitor run() {
-    _choreItem = _butler.run(_choreItem);
+    _choreItem = _butler._run(_choreItem);
     return _ChoreJanitor(_choreItem);
   }
 }
@@ -365,7 +365,7 @@ class _ChoreButler {
 
   _ChoreButler(this.prefs);
 
-  ChoreItem decreaseTimes(ChoreItem choreItem) {
+  ChoreItem _decreaseTimes(ChoreItem choreItem) {
     if (!choreItem.done) {
       choreItem.timesRemaining -= 1;
       prefs.setInt(choreItem.mark, choreItem.timesRemaining);
@@ -373,41 +373,41 @@ class _ChoreButler {
     return choreItem;
   }
 
-  bool isDone(ChoreItem choreItem) {
-    int? times = timesRemaining(choreItem.mark);
-    if (times == null) registerChore(choreItem);
-    return timesRemaining(choreItem.mark)! == 0;
+  bool _isDone(ChoreItem choreItem) {
+    int? times = _timesRemaining(choreItem.mark);
+    if (times == null) _registerChore(choreItem);
+    return _timesRemaining(choreItem.mark)! == 0;
   }
 
-  ChoreItem run(ChoreItem choreItem) {
-    if (!isDone(choreItem))
+  ChoreItem _run(ChoreItem choreItem) {
+    if (!_isDone(choreItem))
       return runCatching(() {
             choreItem._func(choreItem._times - (choreItem.timesRemaining - 1));
           }).onSuccess((value) {
-            return decreaseTimes(choreItem);
+            return _decreaseTimes(choreItem);
           }).getOrNull() ??
           choreItem;
     else
       return choreItem;
   }
 
-  List<ChoreItem> getAllChores() {
+  List<ChoreItem> _getAllChores() {
     return prefs
         .getKeys()
         .where((String key) => key.startsWith("$_base_key"))
         .map(
           (String mark) => ChoreItem._withTimesRemaining(
-              timesRemaining: timesRemaining(mark) ?? 1, mark: mark)
+              timesRemaining: _timesRemaining(mark) ?? 1, mark: mark)
             ..mark = mark.split('.').last,
         )
         .toList();
   }
 
-  int? timesRemaining(String mark) {
+  int? _timesRemaining(String mark) {
     return prefs.getInt(mark);
   }
 
-  registerChore(ChoreItem choreItem) {
+  _registerChore(ChoreItem choreItem) {
     prefs.setInt(choreItem.mark, choreItem._times);
   }
 }

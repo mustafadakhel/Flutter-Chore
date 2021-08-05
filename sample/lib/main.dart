@@ -34,6 +34,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    runFiveTimes();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Text(text),
+      ),
+    );
+  }
+
+  runFiveTimes() {
     Chore.builder()
         .invoke((int time) {
           setState(() {
@@ -58,18 +75,5 @@ class _MyHomePageState extends State<MyHomePage> {
             text = "Everything is done";
           });
         });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Text(text),
-      ),
-    );
   }
 }

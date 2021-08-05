@@ -15,6 +15,10 @@ class Chore {
     return _instance;
   }
 
+  /// Initializes the package
+  ///
+  /// This should be called from the main method and you should await
+  /// for it to complete
   static init() async {
     await _instance._init();
   }
@@ -24,6 +28,16 @@ class Chore {
     _butler = _ChoreButler(prefs);
   }
 
+  /// Registers a new chore
+  ///
+  /// Use this to register a new chore with a unique [mark]
+  ///
+  /// [mark] the unique mark for the chore
+  /// [times] the number of times to do the chore (defaults to 1)
+  /// [f] the method that is invoked only as many times as set in
+  /// the [times] parameter
+  ///
+  /// returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner newChore(
     String mark,
     f(int time), {
@@ -33,6 +47,13 @@ class Chore {
     return _instance._newChore(mark, f, times: times);
   }
 
+  /// Registers a chore using a builder
+  ///
+  /// Use this to initialize a new builder that is used to build
+  /// a new chore
+  ///
+  /// returns a [_ChoreFuncBuilder] instance which enables you to set
+  /// the function to be invoked
   static _ChoreFuncBuilder builder() {
     _assertInitialized();
     return _instance._builder();
@@ -53,16 +74,43 @@ class Chore {
     return _ChoreFuncBuilder.withBuilder(_ChoreBuilder(_butler!));
   }
 
+  /// Registers a new chore that runs only once
+  ///
+  /// Use this to register a new chore that runs only once with
+  /// a unique [mark]
+  ///
+  /// [mark] the unique mark for the chore
+  /// [f] the method that is invoked only once
+  ///
+  /// returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner once(String mark, f()) {
     _assertInitialized();
     return _instance._once(mark, f);
   }
 
+  /// Registers a new chore that runs only twice
+  ///
+  /// Use this to register a new chore that runs only twice with
+  /// a unique [mark]
+  ///
+  /// [mark] the unique mark for the chore
+  /// [f] the method that is invoked only twice
+  ///
+  /// returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner twice(String mark, f(int time)) {
     _assertInitialized();
     return _instance._twice(mark, f);
   }
 
+  /// Registers a new chore that runs only thrice
+  ///
+  /// Use this to register a new chore that runs only thrice with
+  /// a unique [mark]
+  ///
+  /// [mark] the unique mark for the chore
+  /// [f] the method that is invoked only thrice
+  ///
+  /// returns a [_ChoreRunner] instance which enables you to run the chore
   static _ChoreRunner thrice(String mark, f(int time)) {
     _assertInitialized();
     return _instance._thrice(mark, f);
@@ -91,6 +139,12 @@ class Chore {
         .mark(mark);
   }
 
+  /// Get all the registered chores
+  ///
+  /// Use this to get a list of all the chores that has been registered
+  /// using any chore methods
+  ///
+  /// returns a list of [ChoreItem] representing all the registered chores
   static List<ChoreItem> getAllChores() {
     _assertInitialized();
     return _instance._getAllChores();
@@ -250,11 +304,10 @@ class _ChoreButler {
     return prefs
         .getKeys()
         .where((String key) => key.startsWith("$_base_key"))
-        .map((String mark) => mark.split('.').last)
         .map(
           (String mark) => ChoreItem._withTimesRemaining(
               timesRemaining: timesRemaining(mark) ?? 1, mark: mark)
-            ..mark = mark,
+            ..mark = mark.split('.').last,
         )
         .toList();
   }

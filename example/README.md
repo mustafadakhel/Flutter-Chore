@@ -1,6 +1,6 @@
-# sample
+# example
 
-A sample app for the flutter chore package
+An example app for the flutter chore package
 
 ## Getting Started
 

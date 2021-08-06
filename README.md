@@ -2,6 +2,7 @@
 <p align="center">
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
   <a href="https://pub.dev/packages/flutter_chore"><img alt="Pub package" src="https://img.shields.io/pub/v/flutter_chore.svg"/></a>
+  <br><br>
   A flutter package for invoking a certain block of code only a fixed amount of times.
 </p>
 

@@ -1,7 +1,7 @@
 # flutter_chore
 <p align="center">
-  <a href="https://opensource.org/licenses/Apache-2.0" target="_blank"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
-  <a href="https://pub.dev/packages/flutter_chore" target="_blank"><img alt="Pub package" src="https://img.shields.io/pub/v/flutter_chore.svg"/></a>
+  <a href="https://opensource.org/licenses/Apache-2.0" target="_blank" rel="noopener noreferrer"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
+  <a href="https://pub.dev/packages/flutter_chore" target="_blank" rel="noopener noreferrer"><img alt="Pub package" src="https://img.shields.io/pub/v/flutter_chore.svg"/></a>
   <br><br>
   A flutter package for invoking a certain block of code only a fixed amount of times.
 </p>
